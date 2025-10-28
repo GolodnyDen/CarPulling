@@ -1,0 +1,42 @@
+{
+  "users": [
+    {
+      "id": "1761676865004",
+      "name": "Денис",
+      "email": "test1@test",
+      "role": "passenger"
+    },
+    {
+      "id": "1761676954558",
+      "name": "Fuf",
+      "email": "test2@test",
+      "role": "driver"
+    },
+    {
+      "id": "1761677073709",
+      "name": "ккк",
+      "email": "dddd@ddd",
+      "role": "passenger"
+    },
+    {
+      "id": "1761679247022",
+      "name": "Денис",
+      "email": "test@test1",
+      "role": "passenger"
+    }
+  ],
+  "rides": [
+    {
+      "id": "1761677002393",
+      "driverId": "1761676954558",
+      "from": "Главный корпус",
+      "to": "Комсомольский проспект",
+      "dateTime": "2025-10-28T21:43",
+      "seatsAvailable": 0,
+      "passengers": [
+        "1761677073709",
+        "1761677073709"
+      ]
+    }
+  ]
+}
