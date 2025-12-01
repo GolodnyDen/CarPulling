@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import type { User } from '../types';
 import type { AxiosError } from 'axios';
-import { User as UserIcon, Car, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState<'driver' | 'passenger'>('passenger');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -16,7 +16,8 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await api.post<User>('/login', { email, role });
+      // Отправляем только email и пароль
+      const response = await api.post<User>('/api/login', { email, password });
       localStorage.setItem('user', JSON.stringify(response.data));
       navigate('/');
     } catch (err) {
@@ -56,33 +57,18 @@ export default function LoginPage() {
             />
           </div>
 
-          <div className="flex space-x-4">
-            <button
-              type="button"
-              onClick={() => setRole('passenger')}
-              className={`flex-1 p-3 rounded-xl flex flex-col items-center ${
-                role === 'passenger'
-                  ? 'bg-indigo-500 text-white shadow-lg'
-                  : 'bg-gray-800 text-gray-400'
-              }`}
-            >
-              <UserIcon className="w-8 h-8 mb-1" />
-              Пассажир
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole('driver')}
-              className={`flex-1 p-3 rounded-xl flex flex-col items-center ${
-                role === 'driver'
-                  ? 'bg-indigo-500 text-white shadow-lg'
-                  : 'bg-gray-800 text-gray-400'
-              }`}
-            >
-              <Car className="w-8 h-8 mb-1" />
-              Водитель
-            </button>
+          <div>
+            <label className="block text-gray-400 mb-2">Пароль</label>
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
           </div>
 
+        
           <button
             type="submit"
             disabled={loading}

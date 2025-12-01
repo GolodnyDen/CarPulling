@@ -23,6 +23,13 @@
       "name": "Денис",
       "email": "test@test1",
       "role": "passenger"
+    },
+    {
+      "id": "1764586117935",
+      "name": "Денис",
+      "email": "test1.@mail.ru",
+      "password": "$2b$10$En9Vf0Si294ulHa2g2pQGuXl.JFM6gcSgJjXICm05KjCeXV76wuMe",
+      "role": "passenger"
     }
   ],
   "rides": [
@@ -36,6 +43,28 @@
       "passengers": [
         "1761677073709",
         "1761677073709"
+      ]
+    },
+    {
+      "id": "1761733368943",
+      "driverId": "1761676954558",
+      "from": "Охотный ряд",
+      "to": "Главнй корпус",
+      "dateTime": "2025-10-31T13:22",
+      "seatsAvailable": 4,
+      "passengers": []
+    },
+    {
+      "id": "1762166506668",
+      "driverId": "1761676954558",
+      "from": "Главный корпус",
+      "to": "Метро Авиамоторная",
+      "dateTime": "2025-11-04T15:45",
+      "seatsAvailable": 0,
+      "passengers": [
+        "1761676954558",
+        "1761679247022",
+        "1764586117935"
       ]
     }
   ]

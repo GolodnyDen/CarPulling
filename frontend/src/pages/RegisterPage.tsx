@@ -9,12 +9,20 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [role, setRole] = useState<'driver' | 'passenger'>('passenger');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Простая клиентская валидация пароля (по желанию)
+    if (password.length < 6) {
+      alert('Пароль должен содержать минимум 6 символов');
+      return;
+    }
+
     try {
-      const response = await api.post<User>('/register', { name, email, role });
+      const response = await api.post<User>('/register', { name, email, password, role });
       localStorage.setItem('user', JSON.stringify(response.data));
       navigate('/');
     } catch (err) {
@@ -55,6 +63,17 @@ export default function RegisterPage() {
               onChange={e => setEmail(e.target.value)}
               className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
+            />
+          </div>
+          <div>
+            <label className="block text-gray-400 mb-2">Пароль</label>
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+              minLength={6}
             />
           </div>
 
