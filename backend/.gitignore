@@ -2,13 +2,10 @@ node_modules/
 package-lock.json
 .env
 .env.local
-dist/
-build/
-output/
-.cache/
-coverage/
+logs/
+*.log
+data/db.json
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
-*.local

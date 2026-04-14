@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { api } from '../services/api';
-import type { User } from '../types';
-import type { AxiosError } from 'axios';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Car, User as UserIcon, ArrowLeft } from 'lucide-react';
+import { useUser } from '../hooks/useUser';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { register, actionLoading } = useUser();
+  
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,24 +17,29 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Простая клиентская валидация пароля (по желанию)
     if (password.length < 6) {
       alert('Пароль должен содержать минимум 6 символов');
       return;
     }
 
-    try {
-      const response = await api.post<User>('/register', { name, email, password, role });
-      localStorage.setItem('user', JSON.stringify(response.data));
+    const result = await register(name, email, password, role);
+    
+    if (result.success) {
       navigate('/');
-    } catch (err) {
-      const error = err as AxiosError<{ error: string }>;
-      alert(error.response?.data?.error || 'Ошибка регистрации');
+    } else {
+      alert(result.error || 'Ошибка регистрации');
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-950 pb-20">
+  return (  
+    <motion.div
+      key={location.pathname} 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="min-h-screen bg-gray-950 pb-20"
+    >
       <div className="sticky top-0 z-10 bg-gray-950 border-b border-gray-800 px-4 py-4">
         <button
           onClick={() => navigate(-1)}
@@ -106,12 +113,13 @@ export default function RegisterPage() {
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-medium py-3 rounded-xl shadow-lg hover:shadow-xl transition-all"
+            disabled={actionLoading === 'register'}
+            className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-medium py-3 rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-70"
           >
-            Зарегистрироваться
+            {actionLoading === 'register' ? 'Регистрация...' : 'Зарегистрироваться'}
           </button>
         </form>
       </div>
-    </div>
+    </motion.div>
   );
 }

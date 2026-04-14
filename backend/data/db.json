@@ -30,6 +30,66 @@
       "email": "test1.@mail.ru",
       "password": "$2b$10$En9Vf0Si294ulHa2g2pQGuXl.JFM6gcSgJjXICm05KjCeXV76wuMe",
       "role": "passenger"
+    },
+    {
+      "id": "1764586381442",
+      "name": "test",
+      "email": "test1test@yesy.com",
+      "password": "$2b$10$L9OC0MUhspnskOJVRMA2nOWt1TxledVAj7fqICOO6AxaDrQ7XPUFm",
+      "role": "driver"
+    },
+    {
+      "id": "1765796949586",
+      "name": "Lee",
+      "email": "email@email.com",
+      "password": "$2b$10$1WcGVGNpr0kFtpwk5DhYYON7wClFZm0k2Esr9ab.dsvGhzfbMsARm",
+      "role": "passenger"
+    },
+    {
+      "id": "1765797598894",
+      "name": "Tee",
+      "email": "email1@email.com",
+      "password": "$2b$10$0mORBLYJvihJuWOVX7nYh.iRpd1M9TMfB9k14pQOmKpNe59du5bIW",
+      "role": "passenger"
+    },
+    {
+      "id": "1772099422572",
+      "name": "Den",
+      "email": "test1@test.com",
+      "password": "$2b$10$RtiCPSGqpevlprX1liR6PuTRYpmwaDXhnM9HYuu370M1BC7QNQWVi",
+      "role": "driver"
+    },
+    {
+      "id": "1772614840227",
+      "name": "орпорп",
+      "email": "hsvjhb@gmail.com",
+      "password": "$2b$10$F3UJuqY4KLBJoeuDmrJN3u5NaVaVIIb7T6LyKD2NiCbUq5rjidrUa",
+      "role": "passenger",
+      "createdAt": "2026-03-04T09:00:40.227Z"
+    },
+    {
+      "id": "1772615024428",
+      "name": "Denis",
+      "email": "testden@mail.com",
+      "password": "$2b$10$aOKp1JzrrwmqwhfiFHow0OicPlOh2NOdKx/vRR94zPDovj6s.WpwS",
+      "role": "passenger",
+      "createdAt": "2026-03-04T09:03:44.428Z"
+    },
+    {
+      "id": "1773651942207",
+      "name": "Den",
+      "email": "testden@test.com",
+      "password": "$2b$10$H9LcE2KQTZGgfhZNi6FxwuX58LQVpAAwR/O6AskUeugDi3CxTkVFu",
+      "role": "passenger",
+      "createdAt": "2026-03-16T09:05:42.207Z"
+    },
+    {
+      "id": "1773653511647",
+      "name": "Leno",
+      "email": "lenotest@test.com",
+      "password": "$2b$10$n3EtYYtNOxE07fHrkiDi/Os7kqXXyyzoKwkH59pKY5tYKBcJQs2sG",
+      "role": "driver",
+      "createdAt": "2026-03-16T09:31:51.647Z"
     }
   ],
   "rides": [
@@ -51,8 +111,10 @@
       "from": "Охотный ряд",
       "to": "Главнй корпус",
       "dateTime": "2025-10-31T13:22",
-      "seatsAvailable": 4,
-      "passengers": []
+      "seatsAvailable": 3,
+      "passengers": [
+        "1764586381442"
+      ]
     },
     {
       "id": "1762166506668",

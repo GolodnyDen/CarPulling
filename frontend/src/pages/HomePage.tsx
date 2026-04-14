@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { api } from '../services/api';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import type { Ride } from '../types';
 import { useUser } from '../hooks/useUser';
-import { MapPin, Clock, Users, Plus, ChevronRight } from 'lucide-react';
+import { MapPin, Users, Plus, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import api from '../services/api';
 
 export default function HomePage() {
+  const location = useLocation();
   const [rides, setRides] = useState<Ride[]>([]);
-  const user = useUser();
+  const { user } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,32 +26,46 @@ export default function HomePage() {
   }, [user]);
 
   if (!user) {
-  return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
-      <div className="max-w-md w-full text-center">
-        <h1 className="text-2xl font-bold text-gray-200 mb-4">Добро пожаловать!</h1>
-        <p className="text-gray-400 mb-6">Войдите или зарегистрируйтесь</p>
-        <div className="space-y-3">
-          <button
-            onClick={() => navigate('/login')}
-            className="w-full bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-xl border border-gray-700"
-          >
-            Войти
-          </button>
-          <button
-            onClick={() => navigate('/register')}
-            className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-medium py-3 px-6 rounded-xl shadow-lg"
-          >
-            Регистрация
-          </button>
+    return (
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="min-h-screen bg-gray-950 flex items-center justify-center p-4"
+      >
+        <div className="max-w-md w-full text-center">
+          <h1 className="text-2xl font-bold text-gray-200 mb-4">Добро пожаловать!</h1>
+          <p className="text-gray-400 mb-6">Войдите или зарегистрируйтесь</p>
+          <div className="space-y-3">
+            <button
+              onClick={() => navigate('/login')}
+              className="w-full bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-xl border border-gray-700"
+            >
+              Войти
+            </button>
+            <button
+              onClick={() => navigate('/register')}
+              className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-medium py-3 px-6 rounded-xl shadow-lg"
+            >
+              Регистрация
+            </button>
+          </div>
         </div>
-      </div>
-    </div>
-  );
-}
+      </motion.div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-950 pb-20">
+    <motion.div
+      key={location.pathname}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="min-h-screen bg-gray-950 pb-20"
+    >
       <div className="sticky top-0 z-10 bg-gray-950 border-b border-gray-800 px-4 py-4">
         <div className="flex justify-between items-center">
           <h1 className="text-xl font-bold text-gray-200">🚗 Поездки</h1>
@@ -113,6 +128,6 @@ export default function HomePage() {
           ))
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

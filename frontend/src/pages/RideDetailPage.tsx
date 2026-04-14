@@ -1,28 +1,34 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { api } from '../services/api';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import type { Ride } from '../types';
 import { useUser } from '../hooks/useUser';
 import type { AxiosError } from 'axios';
 import { MapPin, Clock, Users, ArrowLeft } from 'lucide-react';
 import Toast from '../components/Toast';
+import api from '../services/api';
 
 export default function RideDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const user = useUser();
+  const location = useLocation();
+  const { user } = useUser();
   const [ride, setRide] = useState<Ride | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(true);
 
   useEffect(() => {
     const fetchRide = async () => {
+      setFetchLoading(true);
       try {
-        const res = await api.get<Ride[]>('/rides');
-        const found = res.data.find(r => r.id === id);
-        setRide(found || null);
+        const res = await api.get<Ride>(`/rides/${id}`);
+        setRide(res.data);
       } catch (err) {
         console.error(err);
+        setRide(null);
+      } finally {
+        setFetchLoading(false);
       }
     };
     if (id) fetchRide();
@@ -44,9 +50,31 @@ export default function RideDetailPage() {
     }
   };
 
+  if (fetchLoading) {
+    return (
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="min-h-screen bg-gray-950 flex items-center justify-center p-4"
+      >
+        <div className="text-gray-400 animate-pulse">Загрузка поездки...</div>
+      </motion.div>
+    );
+  }
+
   if (!ride) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="min-h-screen bg-gray-950 flex items-center justify-center p-4"
+      >
         <div className="max-w-md w-full text-center">
           <p className="text-gray-400 mb-4">Поездка не найдена</p>
           <button
@@ -57,12 +85,19 @@ export default function RideDetailPage() {
             Назад
           </button>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 pb-20">
+    <motion.div
+      key={location.pathname}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="min-h-screen bg-gray-950 pb-20"
+    >
       <div className="sticky top-0 z-10 bg-gray-950 border-b border-gray-800 px-4 py-4">
         <button
           onClick={() => navigate(-1)}
@@ -122,6 +157,6 @@ export default function RideDetailPage() {
 
         <Toast message="Вы записались на поездку!" isVisible={showToast} />
       </div>
-    </div>
+    </motion.div>
   );
 }

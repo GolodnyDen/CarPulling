@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { api } from '../services/api';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useUser } from '../hooks/useUser';
 import type { AxiosError } from 'axios';
-import { MapPin, Clock, Users, ArrowLeft } from 'lucide-react';
+import api from '../services/api';
+import { ArrowLeft } from 'lucide-react';
 
 export default function CreateRidePage() {
   const navigate = useNavigate();
-  const user = useUser();
+  const location = useLocation();
+  const { user } = useUser();
 
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
@@ -43,7 +45,15 @@ export default function CreateRidePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 pb-20">
+    
+    <motion.div
+      key={location.pathname}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="min-h-screen bg-gray-950 pb-20"
+    >
       <div className="sticky top-0 z-10 bg-gray-950 border-b border-gray-800 px-4 py-4">
         <button
           onClick={() => navigate(-1)}
@@ -113,6 +123,6 @@ export default function CreateRidePage() {
           </button>
         </form>
       </div>
-    </div>
+    </motion.div>
   );
 }

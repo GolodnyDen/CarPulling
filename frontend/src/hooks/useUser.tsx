@@ -1,15 +1,125 @@
-import { useState, useEffect } from 'react';
-import type { User } from '../types';
+import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
+import api from '../services/api';
+import type { User, ApiResult } from '../types';
 
 export const useUser = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<'login' | 'register' | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('user');
-    if (saved) {
-      setUser(JSON.parse(saved));
+    let isMounted = true;
+    
+    const token = localStorage.getItem('token');
+    if (token) {
+      api.get('/auth/me')
+        .then((res) => {
+          if (isMounted) {
+            setUser(res.data);
+            localStorage.setItem('user', JSON.stringify(res.data));
+          }
+        })
+        .catch(() => {
+          if (isMounted) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            setUser(null);
+          }
+        })
+        .finally(() => {
+          if (isMounted) setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
+    
+    return () => { isMounted = false; };
+  }, []);
+
+  const login = async (email: string, password: string): Promise<ApiResult<{ user: User; token: string }>> => {
+    setActionLoading('login');
+    try {
+      const res = await api.post('/auth/login', { email, password });
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+      setUser(res.data.user);
+      return {success: true, data: res.data };
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response) {
+        return { 
+          success: false, 
+          error: error.response.data.error || 'Ошибка входа' 
+        };
+      }
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Неизвестная ошибка' 
+      };
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const register = async (name: string, email: string, password: string, role: 'driver' | 'passenger'): Promise<ApiResult<{ user: User; token: string }>> => {
+    setActionLoading('register');
+    try {
+      const res = await api.post('/auth/register', { name, email, password, role });
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+      setUser(res.data.user);
+      return {success: true, data: res.data };
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response) {
+        return { 
+          success: false, 
+          error: error.response.data.error || 'Ошибка регистрации' 
+        };
+      }
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Неизвестная ошибка' 
+      };
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+  }, []);
+
+  const refreshUser = useCallback(async (): Promise<ApiResult<User>> => {
+    try {
+      const res = await api.get('/auth/me');
+      setUser(res.data);
+      localStorage.setItem('user', JSON.stringify(res.data));
+      return {success: true, data: res.data };
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response) {
+        return { 
+          success: false, 
+          error: error.response.data.error || 'Не удалось обновить данные' 
+        };
+      }
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Неизвестная ошибка' 
+      };
     }
   }, []);
 
-  return user;
+  return { 
+    user, 
+    loading, 
+    actionLoading, 
+    login, 
+    register, 
+    logout,
+    refreshUser 
+  };
 };
+
+export default useUser;

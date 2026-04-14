@@ -1,35 +1,39 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { api } from '../services/api';
-import type { User } from '../types';
-import type { AxiosError } from 'axios';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
+import { useUser } from '../hooks/useUser';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login, actionLoading } = useUser();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    try {
-      // Отправляем только email и пароль
-      const response = await api.post<User>('/api/login', { email, password });
-      localStorage.setItem('user', JSON.stringify(response.data));
+    
+    const result = await login(email, password);
+    
+    if (result.success) {
       navigate('/');
-    } catch (err) {
-      const error = err as AxiosError<{ error: string }>;
-      alert(error.response?.data?.error || 'Ошибка входа');
-    } finally {
-      setLoading(false);
+    } else {
+      alert(result.error || 'Ошибка входа');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 pb-20">
+    
+    <motion.div
+      key={location.pathname}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="min-h-screen bg-gray-950 pb-20"
+    >
       <div className="sticky top-0 z-10 bg-gray-950 border-b border-gray-800 px-4 py-4">
         <button
           onClick={() => navigate(-1)}
@@ -68,13 +72,12 @@ export default function LoginPage() {
             />
           </div>
 
-        
           <button
             type="submit"
-            disabled={loading}
+            disabled={actionLoading === 'login'}
             className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-medium py-3 rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-70"
           >
-            {loading ? 'Вход...' : 'Войти'}
+            {actionLoading === 'login' ? 'Вход...' : 'Войти'}
           </button>
         </form>
 
@@ -88,6 +91,6 @@ export default function LoginPage() {
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
