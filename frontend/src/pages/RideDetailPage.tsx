@@ -8,6 +8,7 @@ import { MapPin, Clock, Users, ArrowLeft } from 'lucide-react';
 import Toast from '../components/Toast';
 import api from '../services/api';
 
+
 export default function RideDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();

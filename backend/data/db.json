@@ -1,30 +1,6 @@
 {
   "users": [
     {
-      "id": "1761676865004",
-      "name": "Денис",
-      "email": "test1@test",
-      "role": "passenger"
-    },
-    {
-      "id": "1761676954558",
-      "name": "Fuf",
-      "email": "test2@test",
-      "role": "driver"
-    },
-    {
-      "id": "1761677073709",
-      "name": "ккк",
-      "email": "dddd@ddd",
-      "role": "passenger"
-    },
-    {
-      "id": "1761679247022",
-      "name": "Денис",
-      "email": "test@test1",
-      "role": "passenger"
-    },
-    {
       "id": "1764586117935",
       "name": "Денис",
       "email": "test1.@mail.ru",
@@ -90,6 +66,30 @@
       "password": "$2b$10$n3EtYYtNOxE07fHrkiDi/Os7kqXXyyzoKwkH59pKY5tYKBcJQs2sG",
       "role": "driver",
       "createdAt": "2026-03-16T09:31:51.647Z"
+    },
+    {
+      "id": "1776522647180",
+      "name": "Денис",
+      "email": "dentest@mail.com",
+      "password": "$2b$10$BqIjgadb1.srjLsQKupw.OLUm36PZxJh9cVarpl.vWfRMBJ4EQOCS",
+      "role": "passenger",
+      "avatar": null,
+      "rating": 0,
+      "ratingCount": 0,
+      "isEmailVerified": false,
+      "createdAt": "2026-04-18T14:30:47.180Z"
+    },
+    {
+      "id": "1776525902264",
+      "name": "DOM",
+      "email": "dom@test.com",
+      "password": "$2b$10$.T2YC7HWZmsr3vT7AItpxeH0RH4c06haQr3MkLspD1lwqFyfgW5U6",
+      "role": "driver",
+      "avatar": null,
+      "rating": 0,
+      "ratingCount": 0,
+      "isEmailVerified": false,
+      "createdAt": "2026-04-18T15:25:02.264Z"
     }
   ],
   "rides": [
@@ -111,9 +111,10 @@
       "from": "Охотный ряд",
       "to": "Главнй корпус",
       "dateTime": "2025-10-31T13:22",
-      "seatsAvailable": 3,
+      "seatsAvailable": 2,
       "passengers": [
-        "1764586381442"
+        "1764586381442",
+        "1776522647180"
       ]
     },
     {

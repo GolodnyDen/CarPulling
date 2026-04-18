@@ -1,3 +1,4 @@
+// src/hooks/useUser.tsx
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import api from '../services/api';
@@ -13,17 +14,15 @@ export const useUser = () => {
     
     const token = localStorage.getItem('token');
     if (token) {
-      api.get('/auth/me')
+      api.get('/me')
         .then((res) => {
           if (isMounted) {
             setUser(res.data);
-            localStorage.setItem('user', JSON.stringify(res.data));
           }
         })
         .catch(() => {
           if (isMounted) {
             localStorage.removeItem('token');
-            localStorage.removeItem('user');
             setUser(null);
           }
         })
@@ -40,11 +39,10 @@ export const useUser = () => {
   const login = async (email: string, password: string): Promise<ApiResult<{ user: User; token: string }>> => {
     setActionLoading('login');
     try {
-      const res = await api.post('/auth/login', { email, password });
+      const res = await api.post('/login', { email, password });
       localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
       setUser(res.data.user);
-      return {success: true, data: res.data };
+      return { success: true, data: res.data };
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response) {
         return { 
@@ -64,11 +62,10 @@ export const useUser = () => {
   const register = async (name: string, email: string, password: string, role: 'driver' | 'passenger'): Promise<ApiResult<{ user: User; token: string }>> => {
     setActionLoading('register');
     try {
-      const res = await api.post('/auth/register', { name, email, password, role });
+      const res = await api.post('/register', { name, email, password, role });
       localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
       setUser(res.data.user);
-      return {success: true, data: res.data };
+      return { success: true, data: res.data };
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response) {
         return { 
@@ -87,16 +84,14 @@ export const useUser = () => {
 
   const logout = useCallback(() => {
     localStorage.removeItem('token');
-    localStorage.removeItem('user');
     setUser(null);
   }, []);
 
   const refreshUser = useCallback(async (): Promise<ApiResult<User>> => {
     try {
-      const res = await api.get('/auth/me');
+      const res = await api.get('/me');
       setUser(res.data);
-      localStorage.setItem('user', JSON.stringify(res.data));
-      return {success: true, data: res.data };
+      return { success: true, data: res.data };
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response) {
         return { 

@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Индексируемые страницы
+Allow: /$
+Allow: /ride/
+
+# Закрытые страницы
+Disallow: /login
+Disallow: /register
+Disallow: /profile
+Disallow: /create
+Disallow: /api/
+
+# Sitemap
+Sitemap: http://localhost:5000/sitemap.xml

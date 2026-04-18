@@ -1,37 +1,79 @@
-import type { Ride } from '../types';
+import api from './api';
+import type { Ride, RideQueryParams, PaginatedResponse, User } from '../types';
 
-let rides: Ride[] = JSON.parse(localStorage.getItem('rides') || '[]');
+export const rideService = {
+  getRides: async (params: RideQueryParams) => {
+    const queryString = new URLSearchParams(
+      Object.entries(params).reduce((acc, [k, v]) => {
+        if (v !== undefined && v !== null && v !== '') acc[k] = String(v);
+        return acc;
+      }, {} as Record<string, string>)
+    ).toString();
+    
+    const res = await api.get<PaginatedResponse<Ride>>(`/rides?${queryString}`);
+    return res.data;
+  },
 
-export const getRides = (): Ride[] => {
-  return rides;
-};
+  getRideById: async (id: string) => {
+    const res = await api.get<Ride>(`/rides/${id}`);
+    return res.data;
+  },
 
-export const saveRides = (newRides: Ride[]) => {
-  rides = newRides;
-  localStorage.setItem('rides', JSON.stringify(rides));
-};
+  createRide: async (ride: Partial<Ride>) => {
+    const res = await api.post<Ride>('/rides', ride);
+    return res.data;
+  },
 
-export const createRide = (ride: Omit<Ride, 'id' | 'passengers'>): Ride => {
-  const newRide: Ride = {
-    ...ride,
-    id: Date.now().toString(),
-    passengers: [],
-  };
-  const updated = [...rides, newRide];
-  saveRides(updated);
-  return newRide;
-};
+  updateRide: async (id: string, updates: Partial<Ride>) => {
+    const res = await api.put<Ride>(`/rides/${id}`, updates);
+    return res.data;
+  },
 
-export const joinRide = (rideId: string, userId: string) => {
-  const updated = rides.map(ride => {
-    if (ride.id === rideId && ride.seatsAvailable > 0) {
-      return {
-        ...ride,
-        seatsAvailable: ride.seatsAvailable - 1,
-        passengers: [...ride.passengers, userId],
-      };
-    }
-    return ride;
-  });
-  saveRides(updated);
+  deleteRide: async (id: string) => {
+    const res = await api.delete<{ message: string }>(`/rides/${id}`);
+    return res.data;
+  },
+
+  joinRide: async (id: string, userId: string) => {
+    const res = await api.post<Ride>(`/rides/${id}/join`, { userId });
+    return res.data;
+  },
+
+  getCurrentUser: async () => {
+    const res = await api.get<User>('/me');
+    return res.data;
+  },
+
+  updateUser: async (updates: Partial<User>) => {
+    const res = await api.put<User>('/me', updates);
+    return res.data;
+  },
+
+  deleteUser: async () => {
+    const res = await api.delete<{ message: string }>('/me');
+    return res.data;
+  },
+
+  uploadAvatar: async (file: File) => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    const res = await api.post<{ avatar: string }>('/users/avatar', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return res.data;
+  },
+
+  uploadRideImage: async (rideId: string, file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const res = await api.post<{ routeImage: string }>(`/rides/${rideId}/image`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return res.data;
+  },
+
+  deleteFile: async (filename: string) => {
+    const res = await api.delete<{ message: string }>(`/api/files/${filename}`);
+    return res.data;
+  },
 };
