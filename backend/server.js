@@ -8,22 +8,19 @@ const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 
 const sitemapRoutes = require('./routes/sitemap');
-const weatherRoutes = require('./routes/weather');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'carpool_secret_12345';
 
-// === MIDDLEWARE ===
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// === ROUTES ===
-app.use(sitemapRoutes);
-app.use(weatherRoutes);
 
-// === FILE UPLOAD CONFIG ===
+app.use(sitemapRoutes);
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = path.join(__dirname, 'uploads');
@@ -54,7 +51,6 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }
 });
 
-// === DATABASE ===
 const DB_PATH = path.join(__dirname, 'data', 'db.json');
 
 if (!fs.existsSync(path.dirname(DB_PATH))) {
@@ -72,8 +68,6 @@ function readDB() {
 function writeDB(data) {
   fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
 }
-
-// === UTILITIES ===
 
 function filterAndPaginate(items, filters, searchFields = []) {
   let result = [...items];
@@ -275,7 +269,6 @@ app.delete('/api/me', authenticateToken, (req, res) => {
   res.json({ message: 'Аккаунт удалён' });
 });
 
-// === RIDES ROUTES ===
 
 app.get('/api/rides', validatePaginationParams, (req, res) => {
   const db = readDB();
@@ -478,6 +471,6 @@ module.exports = {
 
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`✅ Бэкенд запущен на http://localhost:${PORT}`);
+    console.log(`Бэкенд запущен на http://localhost:${PORT}`);
   });
 }
