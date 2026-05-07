@@ -1,5 +1,6 @@
 const request = require('supertest');
-const app = require('../../server');
+const server = require('../../server');
+const app = server.app;
 const fs = require('fs');
 const path = require('path');
 const TEST_DB_PATH = path.join(__dirname, '..', '..', 'data', 'test-db.json');

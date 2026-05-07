@@ -1,5 +1,5 @@
-const { filterAndPaginate } = require('../../server');
-
+const server = require('../../server');
+const { filterAndPaginate } = server;
 describe('filterAndPaginate', () => {
   const rides = [
     { id: '1', from: 'Москва', to: 'СПб', seatsAvailable: 3, dateTime: '2024-12-20' },
