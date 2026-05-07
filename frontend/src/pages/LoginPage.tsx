@@ -25,7 +25,6 @@ export default function LoginPage() {
   };
 
   return (
-    
     <motion.div
       key={location.pathname}
       initial={{ opacity: 0, y: 20 }}
@@ -49,9 +48,13 @@ export default function LoginPage() {
         <p className="text-gray-400 mb-6">Уже есть аккаунт? Войдите здесь</p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* EMAIL FIELD */}
           <div>
-            <label className="block text-gray-400 mb-2">Email</label>
+            <label htmlFor="email" className="block text-gray-400 mb-2">
+              Email
+            </label>
             <input
+              id="email"
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
@@ -61,13 +64,18 @@ export default function LoginPage() {
             />
           </div>
 
+          {/* PASSWORD FIELD */}
           <div>
-            <label className="block text-gray-400 mb-2">Пароль</label>
+            <label htmlFor="password" className="block text-gray-400 mb-2">
+              Пароль
+            </label>
             <input
+              id="password"
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="••••••••"
               required
             />
           </div>
