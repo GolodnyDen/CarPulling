@@ -1,15 +1,12 @@
 import '@testing-library/jest-dom';
-import {vi, beforeEach} from 'vitest'; 
-
-global.fetch = vi.fn();
-
+import { vi, beforeEach} from 'vitest';
 interface StorageMock {
   getItem: (key: string) => string | null;
   setItem: (key: string, value: string) => void;
   removeItem: (key: string) => void;
   clear: () => void;
   key: (index: number) => string | null;
-  readonly length: number;
+  length: number;
 }
 
 const localStorageMock: StorageMock = {
@@ -24,7 +21,10 @@ const localStorageMock: StorageMock = {
 Object.defineProperty(global, 'localStorage', {
   value: localStorageMock,
   writable: true,
+  configurable: true,
 });
+
+global.fetch = vi.fn();
 
 beforeEach(() => {
   vi.clearAllMocks();
