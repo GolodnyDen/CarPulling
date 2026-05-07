@@ -92,8 +92,12 @@ describe('LoginPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /войти/i }));
 
     await waitFor(() => {
-      // @ts-expect-error - toBeInTheDocument может отсутствовать в типах Vitest без глобальной декларации
-      expect(screen.getByText(/Неверные данные/)).toBeInTheDocument();
+      const errorElement = screen.getByText(/Неверные данные|Неизвестная ошибка/);
+      // @ts-expect-error - toBeInTheDocument может отсутствовать в типах
+      expect(errorElement).toBeInTheDocument();
+      
+      // @ts-expect-error - убедимся, что текст именно тот, который нужен
+      expect(errorElement).toHaveTextContent(/Неверные данные/);
     });
   });
 });
