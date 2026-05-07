@@ -1,4 +1,4 @@
-mport { test, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 test('полный сценарий: регистрация → создание поездки → просмотр', async ({ page }) => {
   // 1. Открываем главную
