@@ -11,16 +11,18 @@ export default function LoginPage() {
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null); // Сбрасываем ошибку перед новой попыткой
     
     const result = await login(email, password);
     
     if (result.success) {
       navigate('/');
     } else {
-      alert(result.error || 'Ошибка входа');
+      setError(result.error || 'Ошибка входа');
     }
   };
 
@@ -79,6 +81,12 @@ export default function LoginPage() {
               required
             />
           </div>
+
+          {error && (
+            <div className="p-3 bg-red-900/50 border border-red-500 rounded-lg text-red-200 text-sm text-center">
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"

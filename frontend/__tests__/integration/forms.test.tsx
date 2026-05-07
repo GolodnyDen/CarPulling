@@ -1,8 +1,6 @@
-// frontend/__tests__/integration/forms.test.tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import '@testing-library/jest-dom';
 import LoginPage from '../../src/pages/LoginPage';
 import api from '../../src/services/api';
 
@@ -17,23 +15,15 @@ interface AuthResponse {
   token: string;
 }
 
-interface ApiError {
-  response?: {
-    data?: {
-      error?: string;
-    };
-  };
-}
-
 vi.mock('../../src/services/api', () => ({
   default: {
     post: vi.fn(),
     get: vi.fn(),
-    interceptors: { 
-      request: { use: vi.fn() }, 
-      response: { use: vi.fn() } 
-    }
-  }
+    interceptors: {
+      request: { use: vi.fn() },
+      response: { use: vi.fn() },
+    },
+  },
 }));
 
 describe('LoginPage', () => {
@@ -45,13 +35,13 @@ describe('LoginPage', () => {
   it('отправляет форму с валидными данными', async () => {
     vi.mocked(api.post).mockResolvedValue({
       success: true,
-      user: { 
-        id: '1', 
-        name: 'Test', 
-        email: 't@t.com', 
-        role: 'passenger' as const
+      user: {
+        id: '1',
+        name: 'Test',
+        email: 't@t.com',
+        role: 'passenger' as const,
       },
-      token: 'abc'
+      token: 'abc',
     } as AuthResponse);
 
     render(
@@ -61,25 +51,31 @@ describe('LoginPage', () => {
     );
 
     fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: 'test@example.com' }
+      target: { value: 'test@example.com' },
     });
     fireEvent.change(screen.getByLabelText(/пароль/i), {
-      target: { value: '123456' }
+      target: { value: '123456' },
     });
     fireEvent.click(screen.getByRole('button', { name: /войти/i }));
 
     await waitFor(() => {
       expect(api.post).toHaveBeenCalledWith('/login', {
         email: 'test@example.com',
-        password: '123456'
+        password: '123456',
       });
     });
   });
 
   it('показывает ошибку при неверном пароле', async () => {
-    vi.mocked(api.post).mockRejectedValue({
-      response: { data: { error: 'Неверные данные' } }
-    } as ApiError);
+    const mockError = {
+      response: {
+        data: {
+          error: 'Неверные данные',
+        },
+      },
+    };
+
+    vi.mocked(api.post).mockRejectedValue(mockError);
 
     render(
       <BrowserRouter>
@@ -88,14 +84,15 @@ describe('LoginPage', () => {
     );
 
     fireEvent.change(screen.getByLabelText(/email/i), {
-      target: { value: 'test@example.com' }
+      target: { value: 'test@example.com' },
     });
     fireEvent.change(screen.getByLabelText(/пароль/i), {
-      target: { value: 'wrong' }
+      target: { value: 'wrong' },
     });
     fireEvent.click(screen.getByRole('button', { name: /войти/i }));
 
     await waitFor(() => {
+      // @ts-expect-error - toBeInTheDocument может отсутствовать в типах Vitest без глобальной декларации
       expect(screen.getByText(/Неверные данные/)).toBeInTheDocument();
     });
   });
