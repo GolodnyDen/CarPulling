@@ -418,6 +418,12 @@ app.delete('/api/files/:filename', authenticateToken, (req, res) => {
   res.json({ message: 'Файл удалён' });
 });
 
+module.exports = {
+  filterAndPaginate,
+  validatePaginationParams,
+  authenticateToken,
+};
+
 app.use((req, res, next) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API endpoint not found' });
@@ -428,6 +434,23 @@ app.use((req, res, next) => {
 app.use('/api/*', (req, res) => {
   res.status(404).json({ error: 'Endpoint not found' });
 });
+
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV
+  });
+});
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+  });
 app.listen(PORT, () => {
-  console.log(`✅ Бэкенд запущен на http://localhost:${PORT}`);
+  console.log(`Бэкенд запущен на http://localhost:${PORT}`);
 });

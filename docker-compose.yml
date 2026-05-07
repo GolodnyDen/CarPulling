@@ -1,0 +1,92 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: carpulling-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - JWT_SECRET=${JWT_SECRET:-carpool_secret_12345}
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:5173}
+    volumes:
+      - backend-data:/app/data
+      - backend-uploads:/app/uploads
+    networks:
+      - carpulling-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:5000/api
+    container_name: carpulling-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - carpulling-network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: carpulling-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - carpulling-network
+    restart: unless-stopped
+
+  test-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: carpulling-test-backend
+    environment:
+      - NODE_ENV=test
+      - JWT_SECRET=test_secret
+    volumes:
+      - ./backend/__tests__:/app/__tests__
+    command: npm test
+    networks:
+      - carpulling-network
+    profiles:
+      - test
+
+  test-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: carpulling-test-frontend
+    command: npm test
+    networks:
+      - carpulling-network
+    profiles:
+      - test
+
+networks:
+  carpulling-network:
+    driver: bridge
+
+volumes:
+  backend-data:
+    driver: local
+  backend-uploads:
+    driver: local

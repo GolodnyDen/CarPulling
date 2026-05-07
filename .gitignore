@@ -1,0 +1,98 @@
+# Зависимости
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Переменные окружения (секреты!)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Логи
+logs/
+*.log
+
+# Системные файлы
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# ==================== DOCKER ====================
+# Docker
+.docker/
+docker-compose.override.yml
+*.dockerfile
+
+# Docker volumes (данные не коммитим)
+volumes/
+
+# ==================== ТЕСТЫ И СБОРКА ====================
+# Покрытие тестов
+coverage/
+.nyc_output/
+jest-coverage/
+
+# Артефакты сборки
+dist/
+build/
+out/
+
+# ==================== E2E (Playwright) ====================
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+
+# Скриншоты и видео тестов
+*.png
+*.jpg
+*.mp4
+*.webm
+!*.md
+
+# ==================== ТИПЫ И КЭШ ====================
+# TypeScript
+*.tsbuildinfo
+
+# ==================== ДОКУМЕНТАЦИЯ ====================
+# Документация (если генерируется)
+docs/api/
+coverage/lcov-report/
+
+# ==================== ОСОБЕННОСТИ ПРОЕКТА ====================
+# Тестовая БД (если создаётся динамически)
+backend/data/test-db.json
+backend/data/*.test.json
+
+# Загруженные файлы (не коммитим пользовательский контент)
+backend/uploads/
+!backend/uploads/.gitkeep
+
+# ==================== CI/CD ====================
+# GitHub Actions кэш
+.github/cache/
+
+# ==================== ИСКЛЮЧЕНИЯ (что НЕ игнорировать) ====================
+# ! означает "НЕ игнорировать"
+
+# Примеры .env для разработчиков
+!.env.example
+
+# Пустые .gitkeep для структуры
+!**/.gitkeep
+
+# README и лицензия
+!README.md
+!LICENSE

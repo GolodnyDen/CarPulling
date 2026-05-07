@@ -1,0 +1,39 @@
+# Git
+.git
+.gitignore
+
+# Node modules (устанавливаются внутри контейнера)
+node_modules
+npm-debug.log
+
+# Тесты и документация
+__tests__
+*.test.js
+*.test.ts
+*.md
+docs/
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+dist
+build
+*.log
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db

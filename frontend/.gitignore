@@ -1,14 +1,38 @@
+# Зависимости
 node_modules/
-package-lock.json
+
+# Логи
+logs/
+*.log
+npm-debug.log*
+
+# Тесты
+coverage/
+__tests__/__snapshots__/
+jest-coverage/
+
+# Данные (не коммитим пользовательские данные)
+data/*.json
+!data/db.json.example
+!data/.gitkeep
+
+# Загруженные файлы
+uploads/
+!uploads/.gitkeep
+
+# Переменные окружения
 .env
 .env.local
-dist/
-build/
-output/
-.cache/
-coverage/
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Системные
 .DS_Store
 Thumbs.db
-.vscode/
-.idea/
-*.local
+
+# TypeScript (если используется)
+*.tsbuildinfo
