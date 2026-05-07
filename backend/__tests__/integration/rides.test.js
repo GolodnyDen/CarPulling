@@ -6,71 +6,71 @@ const app = server.app;
 const fs = require('fs');
 const path = require('path');
 
-const TEST_DB_DIR = path.join(__dirname, '..', '..', 'data');
-const TEST_DB_PATH = path.join(TEST_DB_DIR, 'db.json');
+const DB_DIR = path.join(__dirname, '..', 'data');
+const DB_PATH = path.join(DB_DIR, 'db.json');
 
 let token;
 let userId;
-const uniqueId = Date.now();
-const testEmail = `driver_${uniqueId}@test.com`;
 
-function initTestDb() {
-  if (!fs.existsSync(TEST_DB_DIR)) {
-    fs.mkdirSync(TEST_DB_DIR, { recursive: true });
+const TEST_EMAIL = `rides_test_${process.env.JEST_WORKER_ID || 'single'}@test.com`;
+const TEST_PASSWORD = 'password123';
+
+function resetDb() {
+  if (!fs.existsSync(DB_DIR)) {
+    fs.mkdirSync(DB_DIR, { recursive: true });
   }
-  const initialData = { users: [], rides: [] };
-  fs.writeFileSync(TEST_DB_PATH, JSON.stringify(initialData, null, 2));
+  const emptyDb = { users: [], rides: [] };
+  fs.writeFileSync(DB_PATH, JSON.stringify(emptyDb, null, 2));
 }
 
 beforeAll(async () => {
-  // 1. Инициализируем чистую БД
-  initTestDb();
+  resetDb();
 
-  // 2. Регистрируем пользователя
   const registerRes = await request(app)
     .post('/api/register')
     .send({
-      name: 'Driver Test',
-      email: testEmail,
-      password: '123456',
+      name: 'Rides Test User',
+      email: TEST_EMAIL,
+      password: TEST_PASSWORD,
       role: 'driver'
     });
 
   if (registerRes.status !== 201) {
-    throw new Error(`Registration failed: ${JSON.stringify(registerRes.body)}`);
+    console.error(' Registration failed:', registerRes.body);
+    throw new Error(`Registration failed with status ${registerRes.status}: ${JSON.stringify(registerRes.body)}`);
   }
 
-  // 3. Логинимся
+  userId = registerRes.body.user.id;
+
   const loginRes = await request(app)
     .post('/api/login')
     .send({
-      email: testEmail,
-      password: '123456'
+      email: TEST_EMAIL,
+      password: TEST_PASSWORD
     });
 
-  if (loginRes.status !== 200 || !loginRes.body.user) {
+  if (loginRes.status !== 200 || !loginRes.body.user || !loginRes.body.token) {
+    console.error(' Login failed:', loginRes.body);
     throw new Error(`Login failed: ${JSON.stringify(loginRes.body)}`);
   }
 
   token = loginRes.body.token;
-  userId = loginRes.body.user.id;
 });
 
 afterEach(() => {
-  if (fs.existsSync(TEST_DB_PATH)) {
+  if (fs.existsSync(DB_PATH)) {
     try {
-      const currentDb = JSON.parse(fs.readFileSync(TEST_DB_PATH, 'utf8'));
-      const testUser = currentDb.users.find(u => u.id === userId);
-      fs.writeFileSync(TEST_DB_PATH, JSON.stringify({ 
-        users: testUser ? [testUser] : [], 
-        rides: [] 
+      const currentDb = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+      const user = currentDb.users.find(u => u.id === userId);
+      
+      fs.writeFileSync(DB_PATH, JSON.stringify({
+        users: user ? [user] : [],
+        rides: []
       }, null, 2));
     } catch (err) {
-      initTestDb();
-      fs.writeFileSync(TEST_DB_PATH, JSON.stringify({ users: [], rides: [] }, null, 2));
+      console.error('Error resetting DB after test:', err);
+      resetDb();
     }
-  } else {
-    initTestDb();
   }
 });
 
@@ -98,7 +98,6 @@ describe('GET /api/rides', () => {
     const res = await request(app).get('/api/rides?from=Москва');
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
-    
     expect(res.body.data.length).toBeGreaterThanOrEqual(1);
     expect(res.body.data.some(r => r.from === 'Москва')).toBe(true);
   });
