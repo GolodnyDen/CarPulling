@@ -4,7 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && node index.js",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "test:e2e": "npx playwright test",
+    "test:all": "cd backend && npm test && cd ../frontend && npm test && npx playwright test"
   },
   "repository": {
     "type": "git",
@@ -25,13 +31,5 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1"
-  },
-    "scripts": {
-    "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "cd backend && node index.js",
-    "test:backend": "cd backend && npm test",
-    "test:frontend": "cd frontend && npm test",
-    "test:e2e": "npx playwright test",
-    "test:all": "cd backend && npm test && cd ../frontend && npm test && npx playwright test"
   }
 }
