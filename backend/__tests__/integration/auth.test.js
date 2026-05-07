@@ -1,6 +1,18 @@
 const request = require('supertest');
 const app = require('../../server');
+const fs = require('fs');
+const path = require('path');
+const TEST_DB_PATH = path.join(__dirname, '..', '..', 'data', 'test-db.json');
 
+beforeEach(() => {
+  fs.writeFileSync(TEST_DB_PATH, JSON.stringify({ users: [], rides: [] }, null, 2));
+});
+
+afterEach(() => {
+  if (fs.existsSync(TEST_DB_PATH)) {
+    fs.unlinkSync(TEST_DB_PATH);
+  }
+});
 describe('POST /api/register', () => {
   test('успешная регистрация', async () => {
     const res = await request(app)

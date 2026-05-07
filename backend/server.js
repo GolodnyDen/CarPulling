@@ -6,17 +6,24 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
+
 const sitemapRoutes = require('./routes/sitemap');
+const weatherRoutes = require('./routes/weather');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'carpool_secret_12345';
 
+// === MIDDLEWARE ===
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(sitemapRoutes);
 
+// === ROUTES ===
+app.use(sitemapRoutes);
+app.use(weatherRoutes);
+
+// === FILE UPLOAD CONFIG ===
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = path.join(__dirname, 'uploads');
@@ -47,6 +54,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }
 });
 
+// === DATABASE ===
 const DB_PATH = path.join(__dirname, 'data', 'db.json');
 
 if (!fs.existsSync(path.dirname(DB_PATH))) {
@@ -64,6 +72,8 @@ function readDB() {
 function writeDB(data) {
   fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
 }
+
+// === UTILITIES ===
 
 function filterAndPaginate(items, filters, searchFields = []) {
   let result = [...items];
@@ -151,12 +161,15 @@ function authenticateToken(req, res, next) {
   });
 }
 
+// === AUTH ROUTES ===
 
 app.post('/api/register', async (req, res) => {
   const { name, email, password, role } = req.body;
+  
   if (!name || !email || !password || !role) {
     return res.status(400).json({ error: 'Все поля обязательны' });
   }
+  
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return res.status(400).json({ error: 'Некорректный email' });
@@ -180,10 +193,15 @@ app.post('/api/register', async (req, res) => {
     isEmailVerified: false,
     createdAt: new Date().toISOString(),
   };
+  
   db.users.push(newUser);
   writeDB(db);
 
-  const token = jwt.sign({ id: newUser.id, email: newUser.email, role: newUser.role }, JWT_SECRET, { expiresIn: '7d' });
+  const token = jwt.sign(
+    { id: newUser.id, email: newUser.email, role: newUser.role },
+    JWT_SECRET,
+    { expiresIn: '7d' }
+  );
 
   const { password: _, ...safeUser } = newUser;
   res.status(201).json({ user: safeUser, token });
@@ -191,6 +209,7 @@ app.post('/api/register', async (req, res) => {
 
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
+  
   if (!email || !password) {
     return res.status(400).json({ error: 'Email и пароль обязательны' });
   }
@@ -202,7 +221,11 @@ app.post('/api/login', async (req, res) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.status(401).json({ error: 'Неверные данные' });
 
-  const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+  const token = jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    JWT_SECRET,
+    { expiresIn: '7d' }
+  );
 
   const { password: _, ...safeUser } = user;
   res.json({ user: safeUser, token });
@@ -252,6 +275,7 @@ app.delete('/api/me', authenticateToken, (req, res) => {
   res.json({ message: 'Аккаунт удалён' });
 });
 
+// === RIDES ROUTES ===
 
 app.get('/api/rides', validatePaginationParams, (req, res) => {
   const db = readDB();
@@ -274,6 +298,7 @@ app.get('/api/rides', validatePaginationParams, (req, res) => {
 
 app.post('/api/rides', authenticateToken, (req, res) => {
   const { from, to, dateTime, seatsAvailable, seatsTotal, description } = req.body;
+  
   if (!from || !to || !dateTime || seatsAvailable == null) {
     return res.status(400).json({ error: 'Все поля обязательны' });
   }
@@ -293,6 +318,7 @@ app.post('/api/rides', authenticateToken, (req, res) => {
     routeImage: null,
     createdAt: new Date().toISOString(),
   };
+  
   db.rides.push(ride);
   writeDB(db);
   res.status(201).json(ride);
@@ -358,6 +384,8 @@ app.post('/api/rides/:id/join', authenticateToken, (req, res) => {
   res.json(db.rides[rideIndex]);
 });
 
+// === FILE ROUTES ===
+
 app.post('/api/users/avatar', authenticateToken, upload.single('avatar'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'Файл не загружен' });
   
@@ -402,8 +430,11 @@ app.delete('/api/files/:filename', authenticateToken, (req, res) => {
   }
   
   const db = readDB();
-  const userOwnsFile = db.users.some(u => u.avatar === `/uploads/${filename}` && u.id === req.user.id) ||
-                       db.rides.some(r => r.routeImage === `/uploads/${filename}` && r.driverId === req.user.id);
+  const userOwnsFile = db.users.some(u => 
+    u.avatar === `/uploads/${filename}` && u.id === req.user.id
+  ) || db.rides.some(r => 
+    r.routeImage === `/uploads/${filename}` && r.driverId === req.user.id
+  );
   
   if (!userOwnsFile) {
     return res.status(403).json({ error: 'Нет прав на удаление' });
@@ -418,31 +449,6 @@ app.delete('/api/files/:filename', authenticateToken, (req, res) => {
   res.json({ message: 'Файл удалён' });
 });
 
-module.exports = {
-  filterAndPaginate,
-  validatePaginationParams,
-  authenticateToken,
-};
-
-app.use((req, res, next) => {
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ error: 'API endpoint not found' });
-  }
-  next();
-});
-
-app.use('/api/*', (req, res) => {
-  res.status(404).json({ error: 'Endpoint not found' });
-});
-
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV
-  });
-});
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -450,7 +456,28 @@ app.get('/api/health', (req, res) => {
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development'
   });
-  });
-app.listen(PORT, () => {
-  console.log(`Бэкенд запущен на http://localhost:${PORT}`);
 });
+
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ error: 'Endpoint not found' });
+});
+
+app.use((req, res, next) => {
+  if (!req.path.startsWith('/api/') && !req.path.startsWith('/uploads/')) {
+    return res.status(404).json({ error: 'Page not found' });
+  }
+  next();
+});
+
+module.exports = {
+  app,
+  filterAndPaginate,
+  validatePaginationParams,
+  authenticateToken,
+};
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`✅ Бэкенд запущен на http://localhost:${PORT}`);
+  });
+}
