@@ -31,7 +31,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Start services
-        run: docker-compose up -d backend frontend
+        run: docker compose up -d backend frontend
 
       - name: Wait for services
         run: |
@@ -54,4 +54,4 @@ jobs:
 
       - name: Stop services
         if: always()
-        run: docker-compose down
+        run: docker compose down
