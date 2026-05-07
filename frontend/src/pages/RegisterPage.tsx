@@ -13,12 +13,14 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'driver' | 'passenger'>('passenger');
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     if (password.length < 6) {
-      alert('Пароль должен содержать минимум 6 символов');
+      setError('Пароль должен содержать минимум 6 символов');
       return;
     }
 
@@ -27,7 +29,7 @@ export default function RegisterPage() {
     if (result.success) {
       navigate('/');
     } else {
-      alert(result.error || 'Ошибка регистрации');
+      setError(result.error || 'Ошибка регистрации');
     }
   };
 
@@ -44,6 +46,7 @@ export default function RegisterPage() {
         <button
           onClick={() => navigate(-1)}
           className="text-gray-400 hover:text-gray-200 flex items-center"
+          aria-label="Назад"
         >
           <ArrowLeft className="w-5 h-5 mr-1" />
           Назад
@@ -52,62 +55,98 @@ export default function RegisterPage() {
 
       <div className="p-4 max-w-md mx-auto">
         <h1 className="text-2xl font-bold text-gray-200 mb-6">Регистрация</h1>
+        
+        {error && (
+          <div data-testid="error-message" className="mb-4 p-3 bg-red-900/50 border border-red-500 rounded-lg text-red-200 text-sm text-center">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* NAME FIELD */}
           <div>
-            <label className="block text-gray-400 mb-2">Имя</label>
+            <label htmlFor="name" className="block text-gray-400 mb-2">
+              Имя
+            </label>
             <input
+              id="name"
+              name="name"
+              type="text"
               value={name}
               onChange={e => setName(e.target.value)}
               className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Ваше имя"
               required
             />
           </div>
+
+          {/* EMAIL FIELD */}
           <div>
-            <label className="block text-gray-400 mb-2">Email</label>
+            <label htmlFor="email" className="block text-gray-400 mb-2">
+              Email
+            </label>
             <input
+              id="email"
+              name="email"
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="example@university.edu"
               required
             />
           </div>
+
+          {/* PASSWORD FIELD */}
           <div>
-            <label className="block text-gray-400 mb-2">Пароль</label>
+            <label htmlFor="password" className="block text-gray-400 mb-2">
+              Пароль
+            </label>
             <input
+              id="password"
+              name="password"
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="••••••••"
               required
               minLength={6}
             />
           </div>
 
-          <div className="flex space-x-4">
+          {/* ROLE SELECTION */}
+          <div className="flex space-x-4" role="group" aria-labelledby="role-label">
+            <span id="role-label" className="sr-only">Выберите роль</span>
+            
             <button
               type="button"
+              role="radio"
+              aria-checked={role === 'passenger'}
               onClick={() => setRole('passenger')}
-              className={`flex-1 p-3 rounded-xl flex flex-col items-center ${
+              className={`flex-1 p-3 rounded-xl flex flex-col items-center transition-all ${
                 role === 'passenger'
-                  ? 'bg-indigo-500 text-white shadow-lg'
-                  : 'bg-gray-800 text-gray-400'
+                  ? 'bg-indigo-500 text-white shadow-lg ring-2 ring-indigo-300'
+                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
               }`}
             >
               <UserIcon className="w-8 h-8 mb-1" />
-              Пассажир
+              <span className="text-sm font-medium">Пассажир</span>
             </button>
+
             <button
               type="button"
+              role="radio"
+              aria-checked={role === 'driver'}
               onClick={() => setRole('driver')}
-              className={`flex-1 p-3 rounded-xl flex flex-col items-center ${
+              className={`flex-1 p-3 rounded-xl flex flex-col items-center transition-all ${
                 role === 'driver'
-                  ? 'bg-indigo-500 text-white shadow-lg'
-                  : 'bg-gray-800 text-gray-400'
+                  ? 'bg-indigo-500 text-white shadow-lg ring-2 ring-indigo-300'
+                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
               }`}
             >
               <Car className="w-8 h-8 mb-1" />
-              Водитель
+              <span className="text-sm font-medium">Водитель</span>
             </button>
           </div>
 
